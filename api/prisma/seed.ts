@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import * as bcrypt from 'bcrypt';
 import { PrismaClient } from '../src/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
@@ -34,6 +35,7 @@ const catalog = {
 };
 
 async function main() {
+  let n = 0;
   for (const [name, books] of Object.entries(catalog)) {
     const genre = await prisma.genre.upsert({
       where: { name },
@@ -41,20 +43,27 @@ async function main() {
       create: { name },
     });
     await prisma.book.createMany({
-      data: books.map((b) => ({ ...b, genreId: genre.id })),
+      data: books.map((b) => ({
+        ...b,
+        isbn: `978000000${String(++n).padStart(4, '0')}`,
+        totalCopies: 3,
+        availableCopies: 3,
+        genreId: genre.id,
+      })),
       skipDuplicates: true,
     });
   }
 
+  const password = await bcrypt.hash('Password123!', 10);
   await prisma.user.upsert({
     where: { email: 'librarian@example.com' },
     update: {},
-    create: { email: 'librarian@example.com', name: 'Test Librarian', role: 'LIBRARIAN' },
+    create: { email: 'librarian@example.com', name: 'Test Librarian', password, role: 'LIBRARIAN' },
   });
   await prisma.user.upsert({
     where: { email: 'patron@example.com' },
     update: {},
-    create: { email: 'patron@example.com', name: 'Test Patron', role: 'PATRON' },
+    create: { email: 'patron@example.com', name: 'Test Patron', password, role: 'PATRON' },
   });
 
   console.log('Seeded.');

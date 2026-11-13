@@ -4,9 +4,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { BooksModule } from './books/books.module';
+import { GenresModule } from './genres/genres.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, BooksModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, BooksModule, GenresModule],
   controllers: [AppController],
   providers: [AppService],
 })

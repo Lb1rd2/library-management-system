@@ -20,14 +20,17 @@ model Genre {
 }
 
 model Book {
-  id            Int      @id @default(autoincrement())
-  title         String
-  author        String
-  publishedYear Int?
-  genreId       Int
-  genre         Genre    @relation(fields: [genreId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  title           String
+  author          String
+  isbn            String   @unique
+  publishedYear   Int?
+  totalCopies     Int      @default(1)
+  availableCopies Int      @default(1)
+  genreId         Int
+  genre           Genre    @relation(fields: [genreId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@unique([title, author])
   @@index([genreId])
@@ -37,6 +40,7 @@ model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String
+  password  String
   role      Role     @default(PATRON)
   createdAt DateTime @default(now())
 }
